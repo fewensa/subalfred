@@ -14,6 +14,11 @@ impl StorageKey {
 	pub fn new() -> Self {
 		Default::default()
 	}
+
+	#[cfg(feature = "codec")]
+	pub fn builder(pallet: impl AsRef<str>, storage: impl AsRef<str>) -> StorageKeyBuilder {
+		StorageKeyBuilder::new(pallet, storage)
+	}
 }
 
 impl Deref for StorageKey {
