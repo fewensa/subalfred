@@ -3,16 +3,19 @@ use std::{
 	fmt::{Display, Formatter, Result as FmtResult},
 	ops::Deref,
 };
+
 // crates.io
-#[cfg(feature = "codec")] use parity_scale_codec::{Decode, Encode};
+#[cfg(feature = "codec")] use parity_scale_codec::{Codec, Decode, Encode};
 
 #[derive(Debug, Default)]
 pub struct StorageKey(pub Vec<u8>);
+
 impl StorageKey {
 	pub fn new() -> Self {
 		Default::default()
 	}
 }
+
 impl Deref for StorageKey {
 	type Target = [u8];
 
@@ -20,21 +23,25 @@ impl Deref for StorageKey {
 		&self.0
 	}
 }
+
 impl Display for StorageKey {
 	fn fmt(&self, f: &mut Formatter) -> FmtResult {
 		write!(f, "{}", array_bytes::bytes2hex("0x", &self.0))
 	}
 }
+
 impl From<Vec<u8>> for StorageKey {
 	fn from(v: Vec<u8>) -> Self {
 		Self(v)
 	}
 }
+
 impl<const N: usize> From<[u8; N]> for StorageKey {
 	fn from(a: [u8; N]) -> Self {
 		Self(a.to_vec())
 	}
 }
+
 impl From<&[u8]> for StorageKey {
 	fn from(a: &[u8]) -> Self {
 		Self(a.to_vec())
@@ -62,6 +69,7 @@ pub enum StorageHasher {
 	Twox64Concat,
 	Identity,
 }
+
 impl StorageHasher {
 	pub fn hash(&self, data: &[u8]) -> StorageKey {
 		match self {
@@ -105,4 +113,42 @@ pub fn storage_double_map_key(
 	storage_double_map_key.0.extend_from_slice(&key2.0.hash(key2.1));
 
 	storage_double_map_key
+}
+
+#[derive(Debug)]
+#[cfg(feature = "codec")]
+pub struct StorageKeyBuilder {
+	pallet: Vec<u8>,
+	storage: Vec<u8>,
+	params: Vec<(StorageHasher, Vec<u8>)>,
+}
+
+#[cfg(feature = "codec")]
+impl StorageKeyBuilder {
+	pub fn new(pallet: impl AsRef<str>, storage: impl AsRef<str>) -> Self {
+		Self {
+			pallet: pallet.as_ref().as_bytes().into(),
+			storage: storage.as_ref().as_bytes().into(),
+			params: vec![],
+		}
+	}
+
+	pub fn param<V: Codec>(&mut self, hasher: StorageHasher, value: &V) -> &mut Self {
+		let v = value.encode();
+		self.params.push((hasher, v));
+		self
+	}
+
+	pub fn build(&self) -> StorageKey {
+		let mut prefix = storage_key(self.pallet.as_ref(), self.storage.as_ref());
+		if self.params.is_empty() {
+			prefix
+		} else {
+			for (hasher, value) in &self.params {
+				let hash = hasher.hash(value.as_ref());
+				prefix.0.extend_from_slice(&hash.0)
+			}
+			prefix
+		}
+	}
 }
