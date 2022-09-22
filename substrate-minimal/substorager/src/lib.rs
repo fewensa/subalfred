@@ -7,7 +7,7 @@ use std::{
 // crates.io
 #[cfg(feature = "codec")] use parity_scale_codec::{Codec, Decode, Encode};
 
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct StorageKey(pub Vec<u8>);
 
 impl StorageKey {
