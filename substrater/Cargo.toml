@@ -1,0 +1,24 @@
+[package]
+name        = "substrater"
+version     = "0.1.0"
+edition     = "2021"
+description = "Substrate client"
+homepage    = "https://subalfred.hack.ink"
+license     = "GPL-3.0"
+readme      = "README.md"
+repository  = "https://github.com/hack-ink/subalfred"
+
+
+[dependencies]
+array-bytes        = { version = "2" }
+async-tungstenite  = { version = "0.17", features = ["async-native-tls"] }
+parity-scale-codec = { version = "2", features = ["derive"] }
+serde              = { version = "1", features = ["derive"] }
+thiserror          = { version = "1" }
+
+subcryptor   = { path = "../substrate-minimal/subcryptor", features = ["codec"] }
+subhasher    = { path = "../substrate-minimal/subhasher" }
+submetadatan = { path = "../substrate-minimal/submetadatan" }
+subrpcer     = { path = "../substrate-minimal/subrpcer" }
+substorager  = { path = "../substrate-minimal/substorager" }
+subtypes     = { path = "../substrate-minimal/subtypes" }

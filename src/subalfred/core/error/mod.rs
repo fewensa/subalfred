@@ -107,7 +107,7 @@ pub enum Node {
 	#[error("[core::node] key-values' count mismatched, expect {expect} got {got}")]
 	KeyValuesCountMismatched { expect: usize, got: usize },
 	#[error("[core::node] failed to parse metadata")]
-	ParseMetadataFailed(#[source] submetadatan::Error),
+	ParseMetadataFailed(#[source] submetadatan::SubmetadatanError),
 	#[error("[core::node] failed to start the node")]
 	StartNodeFailed(#[source] std::io::Error),
 }

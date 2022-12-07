@@ -67,6 +67,7 @@ tokio-selector   = []
 
 [workspace]
 members = [
+	"substrater",
 	"substrate-minimal/*",
 	"substrate-minimal/*/impl",
 ]
